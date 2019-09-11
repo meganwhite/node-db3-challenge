@@ -25,25 +25,53 @@ function findById(id) {
     });
 }
 
-// take out scheme id and order by step number
 function findSteps(id) {
     return db('schemes as sc')
     .join('steps as st', 'sc.id', '=', 'st.scheme_id')
+    .select(
+        "st.id",
+        "sc.scheme_name",
+        "st.step_number",
+        "st.instructions"
+    )
     .where('sc.id',id)
-    .then(steps => {
-      return steps;
-    });
+    .orderBy("st.step_number","asc")
 }
 
 function add(scheme) {
     return db('schemes')
-    .insert(scheme);
+    .insert(scheme)
+    .then(([id]) => {
+        return findById(id)
+    })
+
 }
 
 function update(changes,id) {
+    return db('schemes')
+    .update(changes)
+    .where('id',id)
+    .then(() => {
+        return findById(id)
+    })
 
 }
 
 function remove(id) {
+    let scheme = null;
+    findById(id).then(selectedScheme => {
+        scheme = selectedScheme;
+    })
+    return db('schemes')
+    .where('id',id)
+    .del()
+    .then((selectedScheme) => {
+        if(selectedScheme) {
+            return scheme;
+        }
+        else {
+            return null
+        }
+    })
 
 }
