@@ -1,7 +1,9 @@
 const db = require('../data/db-config.js')
 
 module.exports = {
-    find
+    find,
+    findById,
+    findSteps
 };
 
 function find() {
@@ -11,12 +13,21 @@ function find() {
     });
 }
 
-// function findById(id) {
-//     return db('users as u')
-//     .join('posts as p', 'u.id','=','p.user_id')
-//     .where('u.id',id)
-//     .select('p.id','p.contents','u.username')
-//     .then(posts => {
-//       return posts;
-//     });
-// }
+// how to resolve to null if no valid id?
+function findById(id) {
+    return db('schemes')
+    .where('id',id)
+    .then(schemes => {
+      return schemes;
+    });
+}
+
+// take out scheme id and order by step number
+function findSteps(id) {
+    return db('schemes as sc')
+    .join('steps as st', 'sc.id', '=', 'st.scheme_id')
+    .where('sc.id',id)
+    .then(steps => {
+      return steps;
+    });
+}
